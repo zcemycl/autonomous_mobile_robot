@@ -108,7 +108,7 @@ def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
 
     route = []
     child_node = current_node
-    while parent_node.has_key(child_node):
+    while child_node in parent_node:
         route.append(parent_node[child_node])
         child_node = parent_node[child_node]
         route.sort()

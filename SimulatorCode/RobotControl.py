@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 ROS based interface for the Course Robotics Specialization Capstone Autonomous Rover.
-Updated June 19 2016.
+Updated 02 Feb 2020.
 """
 #import rospy
 
@@ -66,7 +66,7 @@ class RobotControl(object):
         plan = dijkstras(occupancy_map, x_spacing, y_spacing, pos_init, pos_goal)
         self.state_tol = 0.1
         self.path = plan.tolist()
-        print "Path: ", self.path, type(self.path)
+        print("Path: ", self.path, type(self.path))
         self.path.reverse()
         self.path.pop()
         self.state = pos_init
@@ -75,7 +75,7 @@ class RobotControl(object):
         self.vw = (0, 0, False)
         # self.goal[0] += self.x_offset/2
         # self.goal[1] += y_spacing
-        print "INIT GOAL: ", self.goal
+        print("INIT GOAL: ", self.goal)
 
     #     def dijkstras(occupancy_map, x_spacing, y_spacing, start, goal):
 
@@ -90,8 +90,8 @@ class RobotControl(object):
         imu_meas = self.robot_sim.get_imu()
 
         self.vw = self.diff_drive_controller.compute_vel(self.state, self.goal)
-        print "VW: ", self.vw
-        print "Running Controller."
+        print("VW: ", self.vw)
+        print("Running Controller.")
 
         if self.vw[2] == False:
             self.robot_sim.command_velocity(self.vw[0], self.vw[1])
@@ -99,23 +99,23 @@ class RobotControl(object):
             self.robot_sim.command_velocity(0, 0)
         
         est_x = self.kalman_filter.step_filter(self.vw, imu_meas, meas)
-        print "EST X: ", est_x, est_x[2][0]
+        print("EST X: ", est_x, est_x[2][0])
         if est_x[2][0] > 2.617991667:
             est_x[2][0] = 2.617991667
         if est_x[2][0] < 0.523598333:
             est_x[2][0] = 0.523598333
         self.state = est_x
-        print "Get GT Pose: ", self.robot_sim.get_gt_pose()
-        print "EKF Pose: ", est_x
+        print("Get GT Pose: ", self.robot_sim.get_gt_pose())
+        print("EKF Pose: ", est_x)
         self.robot_sim.get_gt_pose()
         self.robot_sim.set_est_state(est_x)
         
-        if imu_meas != None:
+        if np.all(imu_meas != None):
             self.kalman_filter.prediction(self.vw, imu_meas)
 
-        if meas != None and meas != []:
+        if np.all(meas != None) and meas != []:
             print("Measurements: ", meas)
-            if imu_meas != None:
+            if np.all(imu_meas != None):
                 # self.kalman_filter.prediction(self.vw, imu_meas)
                 self.kalman_filter.update(meas)
 
@@ -162,7 +162,7 @@ def main(args):
         robotControl.robot_sim.update_frame()
 
     mng = plt.get_current_fig_manager()
-    mng.frame.Maximize(True)
+#    mng.frame.Maximize(True)
     plt.ioff()
     plt.show()
 
